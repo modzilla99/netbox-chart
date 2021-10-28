@@ -31,14 +31,12 @@ data:
 
     # Post-process certain values
     CORS_ORIGIN_REGEX_WHITELIST = [re.compile(r) for r
-                                   in CORS_ORIGIN_REGEX_WHITELIST]
-    {{- if and (not .Values.redis.enabled) .Values.tasksRedis.sentinels }}
+                                  in CORS_ORIGIN_REGEX_WHITELIST]
+    {{- if and .Values.cachingRedis.sentinels .Values.tasksRedis.sentinels }}
     REDIS['tasks']['SENTINELS'] = [tuple(x.split(r":")) for x
-                                   in REDIS['tasks']['SENTINELS']]
-    {{- end }}
-    {{- if and (not .Values.redis.enabled) .Values.cachingRedis.sentinels }}
+                                  in REDIS['tasks']['SENTINELS']]
     REDIS['caching']['SENTINELS'] = [tuple(x.split(r":")) for x
-                                     in REDIS['caching']['SENTINELS']]
+                                  in REDIS['caching']['SENTINELS']]
     {{- end }}
 
   netbox.yaml: |
@@ -116,13 +114,13 @@ data:
 
     REDIS:
       tasks:
-        {{ if .Values.redis.enabled -}}
-        HOST: {{ printf "%s-master" (include "netbox.redis.fullname" .) | quote }}
-        PORT: {{ .Values.redis.redisPort | int }}
-        {{- else if .Values.tasksRedis.sentinels -}}
+        {{ if .Values.tasksRedis.sentinels -}}
         SENTINELS: {{ toJson .Values.tasksRedis.sentinels }}
         SENTINEL_SERVICE: {{ .Values.tasksRedis.sentinelService | quote }}
         SENTINEL_TIMEOUT: {{ .Values.tasksRedis.sentinelTimeout | int }}
+        {{- else if .Values.redis.enabled -}}
+        HOST: {{ printf "%s-master" (include "netbox.redis.fullname" .) | quote }}
+        PORT: {{ .Values.redis.master.service.port | int }}
         {{- else -}}
         HOST: {{ .Values.tasksRedis.host | quote }}
         PORT: {{ .Values.tasksRedis.port | int}}
@@ -131,13 +129,13 @@ data:
         SSL: {{ toJson .Values.tasksRedis.ssl }}
         INSECURE_SKIP_TLS_VERIFY: {{ toJson .Values.tasksRedis.insecureSkipTlsVerify }}
       caching:
-        {{ if .Values.redis.enabled -}}
-        HOST: {{ printf "%s-master" (include "netbox.redis.fullname" .) | quote }}
-        PORT: {{ .Values.redis.redisPort | int }}
-        {{- else if .Values.cachingRedis.sentinels -}}
+        {{ if .Values.cachingRedis.sentinels -}}
         SENTINELS: {{ toJson .Values.cachingRedis.sentinels }}
         SENTINEL_SERVICE: {{ .Values.cachingRedis.sentinelService | quote }}
         SENTINEL_TIMEOUT: {{ .Values.cachingRedis.sentinelTimeout | int }}
+        {{- else if .Values.redis.enabled -}}
+        HOST: {{ printf "%s-master" (include "netbox.redis.fullname" .) | quote }}
+        PORT: {{ .Values.redis.master.service.port | int }}
         {{- else -}}
         HOST: {{ .Values.cachingRedis.host | quote }}
         PORT: {{ .Values.cachingRedis.port | int}}
