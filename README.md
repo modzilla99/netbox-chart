@@ -89,6 +89,7 @@ The following table lists the configurable parameters for this chart and their d
 | `replicaCount`                                  | The desired number of NetBox pods                                   | `1`                                          |
 | `image.repository`                              | NetBox container image repository                                   | `netboxcommunity/netbox`                     |
 | `image.tag`                                     | NetBox container image tag                                          | `""`                                         |
+| `image.ldap`                                    | Changes image to the official ldap version                          | `false`                                      |
 | `image.pullPolicy`                              | NetBox container image pull policy                                  | `IfNotPresent`                               |
 | `superuser.name`                                | Initial super-user account to create                                | `admin`                                      |
 | `superuser.email`                               | Email address for the initial super-user account                    | `admin@example.com`                          |
@@ -292,7 +293,7 @@ this, the `Secret` must contain the following keys:
 
 ## Using LDAP Authentication
 
-For using LDAP for authentication, specify the ldap-docker image tag of netbox, e.g. "v2.10.3-ldap".
+For using LDAP for authentication, specify the ldap-docker image tag of netbox, e.g. "v3.0.8-ldap" by setting `image.ldap` to true.
 
 Configuration is done via Helm release values. `remoteAuth` should be enabled and configured for LDAP, e.g.:
 

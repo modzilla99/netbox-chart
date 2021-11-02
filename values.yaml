@@ -9,6 +9,8 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
+  # Will change the image to the official version with ldap support
+  ldap: false
 
 superuser:
   name: admin

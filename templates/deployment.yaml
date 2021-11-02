@@ -58,7 +58,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: '{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}{{- if .Values.image.ldap }}{{- printf "-ldap" }}{{- end }}'
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SUPERUSER_NAME
@@ -90,7 +90,7 @@ spec:
               readOnly: true
             {{ if eq .Values.remoteAuth.backend "netbox.authentication.LDAPBackend" -}}
             - name: config
-              mountPath: /etc/netbox/config/ldap/ldap_config.py
+              mountPath: /opt/netbox/netbox/netbox/ldap_config.py
               subPath: ldap_config.py
               readOnly: true
             {{- end }}
