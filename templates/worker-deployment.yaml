@@ -35,9 +35,11 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+      {{- range .Values.imagePullSecrets }}
+        - name: {{ . }}
+      {{- end}}
       {{- end }}
       serviceAccountName: {{ include "netbox.serviceAccountName" . }}
       securityContext:
@@ -46,7 +48,7 @@ spec:
         - name: {{ .Chart.Name }}-worker
           securityContext:
             {{- toYaml .Values.worker.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: '{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}{{- if .Values.image.ldap }}{{- printf "-ldap" }}{{- end }}'
           command:
             - /opt/netbox/venv/bin/python
             - /opt/netbox/netbox/manage.py
